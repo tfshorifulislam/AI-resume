@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, CheckCircle, AlertCircle, TrendingUp,
   Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X,
-  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Award, Code
+  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Link, Plus, Trash2
 } from "lucide-react";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 export default function ResumeAnalyzer() {
   const [file, setFile] = useState<File | null>(null);
@@ -26,29 +27,22 @@ export default function ResumeAnalyzer() {
   // Builder State
   const [builderData, setBuilderData] = useState({
     fullName: "",
-    jobTitle: "",
+    tagline: "",
     email: "",
     phone: "",
     location: "",
-    summary: "",
+    portfolio: "",
+    github: "",
+    linkedin: "",
+    objective: "",
     skills: "",
-    projects: [
-      { name: "", tech: "", description: "" },
-      { name: "", tech: "", description: "" },
-      { name: "", tech: "", description: "" }
-    ],
-    experience: [
-      { company: "", title: "", duration: "", responsibilities: "" },
-      { company: "", title: "", duration: "", responsibilities: "" }
-    ],
     education: [
-      { degree: "", institution: "", year: "" },
       { degree: "", institution: "", year: "" }
-    ],
-    certifications: ""
+    ]
   });
   const [isBuilding, setIsBuilding] = useState(false);
   const [generatedResume, setGeneratedResume] = useState<string | null>(null);
+  const [generatedResumeBody, setGeneratedResumeBody] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -89,6 +83,19 @@ export default function ResumeAnalyzer() {
     }, 2500);
   };
 
+  const handleAddEducation = () => {
+    setBuilderData({
+      ...builderData,
+      education: [...builderData.education, { degree: "", institution: "", year: "" }]
+    });
+  };
+
+  const handleRemoveEducation = (index: number) => {
+    const newEdu = [...builderData.education];
+    newEdu.splice(index, 1);
+    setBuilderData({ ...builderData, education: newEdu });
+  };
+
   const handleBuildResume = () => {
     if (!builderData.fullName) return;
     setIsBuilding(true);
@@ -96,41 +103,15 @@ export default function ResumeAnalyzer() {
 
     setTimeout(() => {
       const name = builderData.fullName.toUpperCase();
-      const title = builderData.jobTitle || "Professional";
+      const title = builderData.tagline || "Professional";
       
-      const summary = builderData.summary 
-        ? builderData.summary.trim() 
+      const objective = builderData.objective 
+        ? builderData.objective.trim() 
         : `Results-driven and highly motivated ${title} with a proven track record of delivering high-impact solutions. Adept at leveraging technical and analytical skills to optimize processes, improve efficiency, and drive project success. Strong communicator and collaborative team player dedicated to achieving organizational objectives and exceeding performance goals.`;
       
       const skillsList = builderData.skills 
         ? builderData.skills.split(',').map(s => `• ${s.trim()}`).join('\n')
         : "• Strategic Planning\n• Project Management\n• Cross-functional Collaboration\n• Problem Solving\n• Data Analysis";
-
-      let formattedExp = "";
-      const validExp = builderData.experience.filter(e => e.company || e.title || e.responsibilities);
-      if (validExp.length > 0) {
-        formattedExp = validExp.map(e => {
-          let str = `${e.title || "Role"} at ${e.company || "Company"}${e.duration ? ` (${e.duration})` : ""}\n`;
-          const resp = e.responsibilities ? e.responsibilities.split('\n').filter(l => l.trim().length > 0) : [];
-          if (resp.length > 0) {
-            str += resp.map(r => `• ${r.trim().replace(/^[-•*]\s*/, '')}`).join('\n');
-          } else {
-            str += `• Spearheaded initiatives resulting in measurable improvements.\n• Collaborated closely with cross-functional teams.`;
-          }
-          return str;
-        }).join('\n\n');
-      } else {
-        formattedExp = "• Successfully managed and executed key projects, consistently meeting deadlines and exceeding expectations.\n• Developed and implemented strategic initiatives that drove a 15% increase in operational efficiency.\n• Mentored junior team members and fostered a collaborative, high-performance work environment.";
-      }
-
-      let formattedProj = "";
-      const validProj = builderData.projects.filter(p => p.name || p.tech || p.description);
-      if (validProj.length > 0) {
-        formattedProj = validProj.map(p => {
-          return `• ${p.name || "Project"} ${p.tech ? `[${p.tech}]` : ""}\n  ${p.description || "Developed and deployed key features."}`;
-        }).join('\n\n');
-        formattedExp = `${formattedProj}\n\nWORK EXPERIENCE\n${formattedExp}`;
-      }
 
       let formattedEdu = "";
       const validEdu = builderData.education.filter(e => e.degree || e.institution);
@@ -140,17 +121,24 @@ export default function ResumeAnalyzer() {
         formattedEdu = "Bachelor of Science\nUniversity of Technology - Graduated with Honors";
       }
 
-      const formattedCerts = builderData.certifications 
-        ? builderData.certifications.split('\n').filter(l=>l.trim().length>0).map(c => `• ${c.trim()}`).join('\n')
-        : `• Professional Certification in ${title}\n• Advanced Training in Agile Methodologies & Leadership`;
-
       const location = builderData.location || "San Francisco, CA";
       const email = builderData.email || "hello@example.com";
       const phone = builderData.phone || "555-0100";
+      
+      const links = [
+        builderData.portfolio ? `🌐 ${builderData.portfolio}` : "",
+        builderData.github ? `💻 ${builderData.github}` : "",
+        builderData.linkedin ? `🔗 ${builderData.linkedin}` : ""
+      ].filter(Boolean).join("  |  ");
 
-      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n📍 ${location}  |  ✉️ ${email}  |  📞 ${phone}  |  🔗 linkedin.com/in/profile\n\nPROFESSIONAL SUMMARY\n${summary}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nPROJECTS OR WORK EXPERIENCE\n${formattedExp}\n\nEDUCATION\n${formattedEdu}\n\nCERTIFICATIONS OR TRAINING\n${formattedCerts}`;
+      const contactInfo = `📍 ${location}  |  ✉️ ${email}  |  📞 ${phone}${links ? `\n${links}` : ""}`;
+
+      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n${contactInfo}\n\nCAREER OBJECTIVE\n${objective}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nEDUCATION\n${formattedEdu}`;
+      
+      const bodyText = `CAREER OBJECTIVE\n${objective}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nEDUCATION\n${formattedEdu}`;
 
       setGeneratedResume(atsResume);
+      setGeneratedResumeBody(bodyText);
       setIsBuilding(false);
     }, 2500);
   };
@@ -575,17 +563,17 @@ export default function ResumeAnalyzer() {
                       value={builderData.fullName}
                       onChange={(e) => setBuilderData({ ...builderData, fullName: e.target.value })}
                       placeholder="e.g. Jane Doe"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Job Title</label>
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Professional Tagline</label>
                     <input
                       type="text"
-                      value={builderData.jobTitle}
-                      onChange={(e) => setBuilderData({ ...builderData, jobTitle: e.target.value })}
-                      placeholder="e.g. Software Engineer"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                      value={builderData.tagline}
+                      onChange={(e) => setBuilderData({ ...builderData, tagline: e.target.value })}
+                      placeholder="e.g. Full Stack Developer"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
                     />
                   </div>
                   <div className="space-y-3">
@@ -595,7 +583,7 @@ export default function ResumeAnalyzer() {
                       value={builderData.email}
                       onChange={(e) => setBuilderData({ ...builderData, email: e.target.value })}
                       placeholder="e.g. jane@example.com"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
                     />
                   </div>
                   <div className="space-y-3">
@@ -605,7 +593,7 @@ export default function ResumeAnalyzer() {
                       value={builderData.phone}
                       onChange={(e) => setBuilderData({ ...builderData, phone: e.target.value })}
                       placeholder="e.g. (555) 123-4567"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
                     />
                   </div>
                   <div className="space-y-3 md:col-span-2">
@@ -615,21 +603,58 @@ export default function ResumeAnalyzer() {
                       value={builderData.location}
                       onChange={(e) => setBuilderData({ ...builderData, location: e.target.value })}
                       placeholder="e.g. San Francisco, CA"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Summary */}
+              {/* Professional Links */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><Link className="w-5 h-5 text-vintage-primary" /> Professional Links</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2">Portfolio URL</label>
+                    <input
+                      type="url"
+                      value={builderData.portfolio}
+                      onChange={(e) => setBuilderData({ ...builderData, portfolio: e.target.value })}
+                      placeholder="e.g. janedoe.com"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><FaGithub className="w-4 h-4 text-vintage-primary" /> GitHub URL</label>
+                    <input
+                      type="url"
+                      value={builderData.github}
+                      onChange={(e) => setBuilderData({ ...builderData, github: e.target.value })}
+                      placeholder="e.g. github.com/janedoe"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><FaLinkedin className="w-4 h-4 text-vintage-primary" /> LinkedIn URL</label>
+                    <input
+                      type="url"
+                      value={builderData.linkedin}
+                      onChange={(e) => setBuilderData({ ...builderData, linkedin: e.target.value })}
+                      placeholder="e.g. linkedin.com/in/janedoe"
+                      className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium shadow-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Career Objective */}
               <div className="space-y-3">
-                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><FileText className="w-4 h-4 text-vintage-primary" /> Professional Summary</label>
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><FileText className="w-4 h-4 text-vintage-primary" /> Career Objective <span className="text-xs font-normal opacity-70 ml-2">(Optional)</span></label>
                 <textarea
-                  value={builderData.summary}
-                  onChange={(e) => setBuilderData({ ...builderData, summary: e.target.value })}
-                  placeholder="Brief overview of your career and goals..."
+                  value={builderData.objective}
+                  onChange={(e) => setBuilderData({ ...builderData, objective: e.target.value })}
+                  placeholder="Write a short career objective..."
                   rows={3}
-                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
+                  className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none shadow-sm"
                 />
               </div>
 
@@ -639,174 +664,87 @@ export default function ResumeAnalyzer() {
                 <textarea
                   value={builderData.skills}
                   onChange={(e) => setBuilderData({ ...builderData, skills: e.target.value })}
-                  placeholder="React, Next.js, TypeScript, Node.js..."
+                  placeholder="React.js, Next.js, TypeScript, Node.js, MongoDB..."
                   rows={2}
-                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
+                  className="w-full px-5 py-3 rounded-2xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none shadow-sm"
                 />
-              </div>
-
-              {/* Projects */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><Code className="w-5 h-5 text-vintage-primary" /> Projects</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {[0, 1, 2].map((idx) => (
-                    <div key={`project-${idx}`} className="bg-vintage-bg/30 p-5 rounded-2xl border border-vintage-secondary/30 space-y-4">
-                      <div className="text-sm font-bold text-vintage-text/60">Project {idx + 1}</div>
-                      <input
-                        type="text"
-                        value={builderData.projects[idx].name}
-                        onChange={(e) => {
-                          const newProjects = [...builderData.projects];
-                          newProjects[idx].name = e.target.value;
-                          setBuilderData({ ...builderData, projects: newProjects });
-                        }}
-                        placeholder="Project Name"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <input
-                        type="text"
-                        value={builderData.projects[idx].tech}
-                        onChange={(e) => {
-                          const newProjects = [...builderData.projects];
-                          newProjects[idx].tech = e.target.value;
-                          setBuilderData({ ...builderData, projects: newProjects });
-                        }}
-                        placeholder="Technologies Used"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <textarea
-                        value={builderData.projects[idx].description}
-                        onChange={(e) => {
-                          const newProjects = [...builderData.projects];
-                          newProjects[idx].description = e.target.value;
-                          setBuilderData({ ...builderData, projects: newProjects });
-                        }}
-                        placeholder="Project Description..."
-                        rows={3}
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 resize-none"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Experience */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><Briefcase className="w-5 h-5 text-vintage-primary" /> Work Experience</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[0, 1].map((idx) => (
-                    <div key={`exp-${idx}`} className="bg-vintage-bg/30 p-5 rounded-2xl border border-vintage-secondary/30 space-y-4">
-                      <div className="text-sm font-bold text-vintage-text/60">Experience {idx + 1}</div>
-                      <input
-                        type="text"
-                        value={builderData.experience[idx].company}
-                        onChange={(e) => {
-                          const newExp = [...builderData.experience];
-                          newExp[idx].company = e.target.value;
-                          setBuilderData({ ...builderData, experience: newExp });
-                        }}
-                        placeholder="Company Name"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <input
-                        type="text"
-                        value={builderData.experience[idx].title}
-                        onChange={(e) => {
-                          const newExp = [...builderData.experience];
-                          newExp[idx].title = e.target.value;
-                          setBuilderData({ ...builderData, experience: newExp });
-                        }}
-                        placeholder="Job Title"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <input
-                        type="text"
-                        value={builderData.experience[idx].duration}
-                        onChange={(e) => {
-                          const newExp = [...builderData.experience];
-                          newExp[idx].duration = e.target.value;
-                          setBuilderData({ ...builderData, experience: newExp });
-                        }}
-                        placeholder="Duration (e.g. 2020 - 2023)"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <textarea
-                        value={builderData.experience[idx].responsibilities}
-                        onChange={(e) => {
-                          const newExp = [...builderData.experience];
-                          newExp[idx].responsibilities = e.target.value;
-                          setBuilderData({ ...builderData, experience: newExp });
-                        }}
-                        placeholder="Responsibilities..."
-                        rows={3}
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 resize-none"
-                      />
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Education */}
               <div className="space-y-4">
-                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><GraduationCap className="w-5 h-5 text-vintage-primary" /> Education</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[0, 1].map((idx) => (
-                    <div key={`edu-${idx}`} className="bg-vintage-bg/30 p-5 rounded-2xl border border-vintage-secondary/30 space-y-4">
-                      <div className="text-sm font-bold text-vintage-text/60">Education {idx + 1}</div>
-                      <input
-                        type="text"
-                        value={builderData.education[idx].degree}
-                        onChange={(e) => {
-                          const newEdu = [...builderData.education];
-                          newEdu[idx].degree = e.target.value;
-                          setBuilderData({ ...builderData, education: newEdu });
-                        }}
-                        placeholder="Degree"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <input
-                        type="text"
-                        value={builderData.education[idx].institution}
-                        onChange={(e) => {
-                          const newEdu = [...builderData.education];
-                          newEdu[idx].institution = e.target.value;
-                          setBuilderData({ ...builderData, education: newEdu });
-                        }}
-                        placeholder="Institution"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
-                      <input
-                        type="text"
-                        value={builderData.education[idx].year}
-                        onChange={(e) => {
-                          const newEdu = [...builderData.education];
-                          newEdu[idx].year = e.target.value;
-                          setBuilderData({ ...builderData, education: newEdu });
-                        }}
-                        placeholder="Passing Year"
-                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
-                      />
+                <div className="flex items-center justify-between border-b border-vintage-secondary/30 pb-2">
+                  <h3 className="text-xl font-bold flex items-center gap-2"><GraduationCap className="w-5 h-5 text-vintage-primary" /> Education</h3>
+                  <button 
+                    onClick={handleAddEducation}
+                    className="flex items-center gap-2 text-sm font-bold text-vintage-primary hover:text-[#E57A54] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Add Education
+                  </button>
+                </div>
+                <div className="space-y-6">
+                  {builderData.education.map((edu, idx) => (
+                    <div key={`edu-${idx}`} className="bg-vintage-bg/30 p-6 rounded-2xl border border-vintage-secondary/30 shadow-sm relative group">
+                      {builderData.education.length > 1 && (
+                        <button 
+                          onClick={() => handleRemoveEducation(idx)}
+                          className="absolute top-4 right-4 text-vintage-text/40 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider opacity-70">Degree</label>
+                          <input
+                            type="text"
+                            value={edu.degree}
+                            onChange={(e) => {
+                              const newEdu = [...builderData.education];
+                              newEdu[idx].degree = e.target.value;
+                              setBuilderData({ ...builderData, education: newEdu });
+                            }}
+                            placeholder="e.g. Bachelor of Science in Computer Science"
+                            className="w-full px-4 py-2.5 rounded-xl border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 bg-white shadow-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider opacity-70">Institution</label>
+                          <input
+                            type="text"
+                            value={edu.institution}
+                            onChange={(e) => {
+                              const newEdu = [...builderData.education];
+                              newEdu[idx].institution = e.target.value;
+                              setBuilderData({ ...builderData, education: newEdu });
+                            }}
+                            placeholder="e.g. Stanford University"
+                            className="w-full px-4 py-2.5 rounded-xl border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 bg-white shadow-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider opacity-70">Passing Year</label>
+                          <input
+                            type="text"
+                            value={edu.year}
+                            onChange={(e) => {
+                              const newEdu = [...builderData.education];
+                              newEdu[idx].year = e.target.value;
+                              setBuilderData({ ...builderData, education: newEdu });
+                            }}
+                            placeholder="e.g. 2024"
+                            className="w-full px-4 py-2.5 rounded-xl border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 bg-white shadow-sm"
+                          />
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Certifications */}
-              <div className="space-y-3">
-                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Award className="w-4 h-4 text-vintage-primary" /> Certifications</label>
-                <textarea
-                  value={builderData.certifications}
-                  onChange={(e) => setBuilderData({ ...builderData, certifications: e.target.value })}
-                  placeholder="AWS Certified Solutions Architect&#10;Google Analytics Individual Qualification..."
-                  rows={2}
-                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
-                />
               </div>
 
               <button
                 onClick={handleBuildResume}
                 disabled={!builderData.fullName || isBuilding}
-                className="w-full mt-4 py-5 bg-vintage-text hover:bg-opacity-90 text-white rounded-full font-bold text-lg flex items-center justify-center space-x-3 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-lg disabled:hover:shadow-none hover:-translate-y-1 disabled:hover:translate-y-0"
+                className="w-full mt-4 py-5 bg-vintage-primary hover:bg-[#E57A54] text-white rounded-full font-bold text-lg flex items-center justify-center space-x-3 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-lg disabled:hover:shadow-none hover:-translate-y-1 disabled:hover:translate-y-0"
               >
                 {isBuilding ? (
                   <>
@@ -846,8 +784,55 @@ export default function ResumeAnalyzer() {
                       </button>
                     </div>
 
-                    <div className="bg-vintage-bg/40 p-8 md:p-10 rounded-[1.5rem] whitespace-pre-wrap font-serif text-lg leading-[1.8] border border-vintage-secondary/30 text-vintage-text/90">
-                      {generatedResume}
+                    <div className="bg-vintage-bg/40 p-8 md:p-10 rounded-[1.5rem] border border-vintage-secondary/30 text-vintage-text/90">
+                      
+                      {/* Professional Two-Column Header */}
+                      <div className="flex flex-col md:flex-row justify-between pb-6 mb-6 border-b border-vintage-secondary/30">
+                        {/* Left Side */}
+                        <div className="space-y-1 mb-4 md:mb-0">
+                          <h1 className="text-3xl md:text-4xl font-extrabold uppercase tracking-wide text-vintage-text">
+                            {builderData.fullName || "Professional"}
+                          </h1>
+                          <h2 className="text-xl md:text-2xl font-serif text-vintage-text/80 mb-2">
+                            {builderData.tagline || "Title"}
+                          </h2>
+                          <div className="flex flex-wrap items-center gap-4 text-sm font-medium mt-3 opacity-90">
+                            {builderData.email && (
+                              <div className="flex items-center gap-1.5"><Mail className="w-4 h-4 text-vintage-primary" /> {builderData.email}</div>
+                            )}
+                            {builderData.phone && (
+                              <div className="flex items-center gap-1.5"><Phone className="w-4 h-4 text-vintage-primary" /> {builderData.phone}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right Side */}
+                        <div className="flex flex-col md:items-end gap-2 text-sm font-medium opacity-90">
+                          {builderData.location && (
+                            <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-vintage-primary" /> {builderData.location}</div>
+                          )}
+                          {builderData.portfolio && (
+                            <a href={builderData.portfolio} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-vintage-primary transition-colors">
+                              <Link className="w-4 h-4 text-vintage-primary" /> Portfolio
+                            </a>
+                          )}
+                          {builderData.github && (
+                            <a href={builderData.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-vintage-primary transition-colors">
+                              <FaGithub className="w-4 h-4 text-vintage-primary" /> GitHub
+                            </a>
+                          )}
+                          {builderData.linkedin && (
+                            <a href={builderData.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-vintage-primary transition-colors">
+                              <FaLinkedin className="w-4 h-4 text-vintage-primary" /> LinkedIn
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Body */}
+                      <div className="whitespace-pre-wrap font-serif text-lg leading-[1.8]">
+                        {generatedResumeBody}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
