@@ -70,9 +70,12 @@ export default function ResumeAnalyzer() {
   return (
     <div className="min-h-screen bg-vintage-bg text-vintage-text font-sans relative overflow-x-hidden selection:bg-vintage-primary/30">
       {/* Background blurred circles */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-vintage-secondary/40 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-[20%] right-[-5%] w-[35rem] h-[35rem] bg-vintage-accent/20 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[20%] w-[40rem] h-[40rem] bg-vintage-secondary/30 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-vintage-secondary/40 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] right-[-5%] w-[35rem] h-[35rem] bg-vintage-accent/20 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[40rem] h-[40rem] bg-vintage-secondary/30 rounded-full blur-[120px]" />
+      </div>
+
 
       {/* Sticky Navbar */}
       <nav 
@@ -130,7 +133,7 @@ export default function ResumeAnalyzer() {
         </AnimatePresence>
       </nav>
 
-      <main className="relative z-10 pt-32 pb-24">
+      <main className="relative z-10 pt-32">
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-20 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div 
