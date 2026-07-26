@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ResumeMint AI
 
-## Getting Started
+ResumeMint AI is a modern AI-powered resume toolkit built with Next.js and TypeScript. It helps users analyze their resumes, improve ATS compatibility, generate professional cover letters, and create clean, ATS-friendly resumes from user input—all within a simple and elegant interface.
 
-First, run the development server:
+<img width="1897" height="951" alt="image" src="https://github.com/user-attachments/assets/ab25ce09-3ddd-452a-80fd-1e8fa84a307e" />
+
+
+## ✨ Features
+
+- 📄 Upload PDF Resume
+- 🤖 AI Resume Analysis
+- 📊 ATS Score Checker
+- 💡 Resume Improvement Suggestions
+- 🧠 Missing Skills Detection
+- ✍️ AI Cover Letter Generator
+- 📑 AI Resume Builder
+- 📥 Download Resume as PDF
+- 📱 Fully Responsive Design
+- 🎨 Warm Vintage UI
+
+## 🛠️ Tech Stack
+
+- Next.js 16
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Lucide React
+- React Icons
+- html2canvas
+- jsPDF
+
+## 🎨 Color Palette
+
+| Color | Hex |
+|--------|-----|
+| Primary | `#F48F68` |
+| Secondary | `#FFE394` |
+| Accent | `#8BDFDD` |
+| Background | `#FFF6DE` |
+
+## 🚀 Getting Started
+
+### Clone the repository
+
+```bash
+git clone https://github.com/tfshorifulislam/resumemint-ai.git
+```
+
+### Navigate to the project
+
+```bash
+cd resumemint-ai
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📂 Project Structure
 
-## Learn More
+```
+app/
+components/
+public/
+types/
+utils/
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 📄 Resume Builder
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The Resume Builder allows users to enter:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Full Name
+- Professional Tagline
+- Email
+- Phone Number
+- Location
+- Portfolio
+- GitHub
+- LinkedIn
+- Career Objective
+- Projects
+- Skills
+- Education
 
-## Deploy on Vercel
+It then generates a clean ATS-friendly resume that can be downloaded as a PDF.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🤖 AI Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Resume Analysis
+- ATS Score
+- Missing Skills Detection
+- Resume Suggestions
+- Cover Letter Generation
+
+## 📸 Screenshots
+
+Add screenshots of your application here.
+
+<img width="1844" height="790" alt="image" src="https://github.com/user-attachments/assets/78f5d1dd-5ef7-44fc-91f4-a0a1eb4e91cb" />
+
+<img width="1844" height="790" alt="image" src="https://github.com/user-attachments/assets/8e845e01-388e-4449-bdc7-0f05c8ef4dfb" />
+
+
+
+
+## 🌐 Live Demo
+
+https://resumimintai.vercel.app
+
+## 📌 Future Improvements
+
+- Multiple Resume Templates
+- Dark Mode
+- AI Resume Rewrite
+- Job Description Matching
+- Resume History
+- Export DOCX
+- Multi-language Support
+
+## 👨‍💻 Author
+
+**Tf Shoriful Islam**
+
+- GitHub: https://github.com/tfshorifulislam
+- LinkedIn: https://linkedin.com/in/tfshorifulisalam
+- Portfolio: https://tfshorifulislam.vercel.app
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+⭐ If you found this project helpful, consider giving it a star on GitHub.
