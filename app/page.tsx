@@ -373,17 +373,50 @@ export default function ResumeAnalyzer() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 bg-white/50 border-t border-vintage-secondary/30 py-12">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2 font-bold text-xl text-vintage-text">
-            <Sparkles className="w-5 h-5 text-vintage-primary" />
-            ResumeMint AI
+      <motion.footer 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 bg-white/60 border-t border-vintage-secondary/40 pt-16 pb-8 mt-12"
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div className="col-span-1 md:col-span-2 space-y-4">
+              <div className="flex items-center gap-2 font-bold text-2xl tracking-tight text-vintage-text">
+                <Sparkles className="w-6 h-6 text-vintage-primary" />
+                ResumeMint AI
+              </div>
+              <p className="text-sm opacity-70 max-w-sm leading-relaxed">
+                Build stronger resumes and professional cover letters with AI.
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="font-bold text-lg">Quick Links</h4>
+              <ul className="space-y-2 text-sm opacity-80 font-medium">
+                <li><a href="#features" className="hover:text-vintage-primary transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-vintage-primary transition-colors">How It Works</a></li>
+                <li><a href="#analyzer" className="hover:text-vintage-primary transition-colors">Resume Tool</a></li>
+              </ul>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-bold text-lg">Resources</h4>
+              <ul className="space-y-2 text-sm opacity-80 font-medium">
+                <li><a href="#" className="hover:text-vintage-primary transition-colors flex items-center gap-2">ATS Tips</a></li>
+                <li><a href="#" className="hover:text-vintage-primary transition-colors flex items-center gap-2">Cover Letter Guide</a></li>
+                <li><a href="#" className="hover:text-vintage-primary transition-colors flex items-center gap-2">Contact</a></li>
+              </ul>
+            </div>
           </div>
-          <div className="text-sm font-medium opacity-60">
-            Built with Next.js, TypeScript & AI
+          
+          <div className="pt-8 border-t border-vintage-secondary/30 flex flex-col md:flex-row items-center justify-between gap-4 text-xs opacity-60 font-medium">
+            <p>© 2026 ResumeMint AI. All rights reserved.</p>
+            <p>Built with Next.js, TypeScript & AI.</p>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
