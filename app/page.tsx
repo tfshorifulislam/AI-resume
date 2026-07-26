@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, CheckCircle, AlertCircle, TrendingUp,
   Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X,
-  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Link, Plus, Trash2, Code
+  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Link, Plus, Trash2, Code, Download
 } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -47,6 +49,8 @@ export default function ResumeAnalyzer() {
   const [generatedResume, setGeneratedResume] = useState<string | null>(null);
   const [generatedResumeData, setGeneratedResumeData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const resumeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -183,6 +187,41 @@ export default function ResumeAnalyzer() {
       navigator.clipboard.writeText(generatedResume);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!resumeRef.current || !generatedResumeData) return;
+    setIsDownloading(true);
+    
+    try {
+      const element = resumeRef.current;
+      
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      const fileName = `${generatedResumeData.fullName.replace(/\s+/g, '_') || 'Generated'}_Resume.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error("Error generating PDF", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -881,63 +920,77 @@ export default function ResumeAnalyzer() {
                         <FileText className="w-7 h-7 text-vintage-primary" />
                         Your Professional Resume
                       </h3>
-                      <button
-                        onClick={handleCopy}
-                        className="px-5 py-2.5 bg-vintage-secondary/30 hover:bg-vintage-secondary/50 text-vintage-text font-bold rounded-full text-sm flex items-center gap-2 transition-colors"
-                      >
-                        {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                        {copied ? "Copied!" : "Copy Resume"}
-                      </button>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          onClick={handleCopy}
+                          className="px-5 py-2.5 bg-vintage-secondary/30 hover:bg-vintage-secondary/50 text-vintage-text font-bold rounded-full text-sm flex items-center gap-2 transition-colors"
+                        >
+                          {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                          {copied ? "Copied!" : "Copy Resume"}
+                        </button>
+                        <button
+                          onClick={handleDownloadPDF}
+                          disabled={isDownloading}
+                          className="px-5 py-2.5 bg-vintage-primary hover:bg-[#E57A54] text-white font-bold rounded-full text-sm flex items-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                        >
+                          {isDownloading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Download className="w-4 h-4" />
+                          )}
+                          {isDownloading ? "Generating..." : "Download PDF"}
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="bg-vintage-bg/40 p-8 md:p-10 rounded-[1.5rem] border border-vintage-secondary/30 text-vintage-text/90">
+                    <div ref={resumeRef} className="bg-[#FFFFFF] p-8 md:p-10 rounded-[1.5rem] border border-[#D9D9D9] text-[#222222]">
                       
                       {/* Professional Two-Column Header */}
-                      <div className="flex flex-col md:flex-row justify-between pb-6 mb-6 border-b border-vintage-secondary/30">
+                      <div className="flex flex-col md:flex-row justify-between pb-6 mb-6 border-b border-[#D9D9D9]">
                         {/* Left Side */}
                         <div className="space-y-1 mb-4 md:mb-0">
-                          <h1 className="text-3xl md:text-4xl font-extrabold uppercase tracking-wide text-vintage-text">
+                          <h1 className="text-3xl md:text-4xl font-extrabold uppercase tracking-wide text-[#222222]">
                             {builderData.fullName || "Professional"}
                           </h1>
-                          <h2 className="text-xl md:text-2xl font-serif text-vintage-text/80 mb-2">
+                          <h2 className="text-xl md:text-2xl font-serif text-[#222222] mb-2">
                             {builderData.tagline || "Title"}
                           </h2>
-                          <div className="flex flex-wrap items-center gap-4 text-sm font-medium mt-3 opacity-90">
+                          <div className="flex flex-wrap items-center gap-4 text-sm font-medium mt-3 text-[#222222]">
                             {builderData.email && (
-                              <div className="flex items-center gap-1.5"><Mail className="w-4 h-4 text-vintage-primary" /> {builderData.email}</div>
+                              <div className="flex items-center gap-1.5"><Mail className="w-4 h-4 text-[#F48F68]" /> {builderData.email}</div>
                             )}
                             {builderData.phone && (
-                              <div className="flex items-center gap-1.5"><Phone className="w-4 h-4 text-vintage-primary" /> {builderData.phone}</div>
+                              <div className="flex items-center gap-1.5"><Phone className="w-4 h-4 text-[#F48F68]" /> {builderData.phone}</div>
                             )}
                           </div>
                         </div>
 
                         {/* Right Side */}
-                        <div className="flex flex-col md:items-end gap-2 text-sm font-medium opacity-90 mt-4 md:mt-0">
+                        <div className="flex flex-col md:items-end gap-2 text-sm font-medium mt-4 md:mt-0 text-[#222222]">
                           {builderData.location && (
-                            <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-vintage-primary" /> {builderData.location}</div>
+                            <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-[#F48F68]" /> {builderData.location}</div>
                           )}
-                          <div className="flex flex-wrap items-center md:justify-end gap-3 mt-1">
+                          <div className="flex flex-wrap items-center md:justify-end gap-3 mt-1 text-[#222222]">
                             {[
                               builderData.portfolio && (
-                                <a key="portfolio" href={builderData.portfolio} target="_blank" rel="noopener noreferrer" className="hover:text-vintage-primary transition-colors">
+                                <a key="portfolio" href={builderData.portfolio} target="_blank" rel="noopener noreferrer" className="hover:text-[#F48F68] transition-colors">
                                   Portfolio
                                 </a>
                               ),
                               builderData.github && (
-                                <a key="github" href={builderData.github} target="_blank" rel="noopener noreferrer" className="hover:text-vintage-primary transition-colors">
+                                <a key="github" href={builderData.github} target="_blank" rel="noopener noreferrer" className="hover:text-[#F48F68] transition-colors">
                                   GitHub
                                 </a>
                               ),
                               builderData.linkedin && (
-                                <a key="linkedin" href={builderData.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-vintage-primary transition-colors">
+                                <a key="linkedin" href={builderData.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#F48F68] transition-colors">
                                   LinkedIn
                                 </a>
                               )
                             ].filter(Boolean).map((link, index, array) => (
                               <div key={index} className="flex items-center gap-3">
                                 {link}
-                                {index < array.length - 1 && <span className="text-vintage-text/40">|</span>}
+                                {index < array.length - 1 && <span className="text-[#222222]">|</span>}
                               </div>
                             ))}
                           </div>
@@ -945,11 +998,11 @@ export default function ResumeAnalyzer() {
                       </div>
 
                       {/* Body */}
-                      <div className="font-serif text-lg leading-[1.8] space-y-8 mt-6">
+                      <div className="font-serif text-lg leading-[1.8] space-y-8 mt-6 text-[#222222]">
                         {/* Career Objective */}
                         {generatedResumeData?.objective && (
                           <div className="space-y-3">
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Career Objective</h3>
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-[#F48F68] border-b border-[#D9D9D9] pb-2">Career Objective</h3>
                             <p className="whitespace-pre-wrap">{generatedResumeData.objective}</p>
                           </div>
                         )}
@@ -957,19 +1010,19 @@ export default function ResumeAnalyzer() {
                         {/* Projects */}
                         {generatedResumeData?.validProj?.length > 0 && (
                           <div className="space-y-4">
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Projects</h3>
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-[#F48F68] border-b border-[#D9D9D9] pb-2">Projects</h3>
                             <div className="space-y-4">
                               {generatedResumeData.validProj.map((proj: any, idx: number) => (
-                                <div key={idx} className="bg-white/60 p-5 rounded-2xl border border-vintage-secondary/30 shadow-sm">
-                                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2 border-b border-vintage-secondary/20 pb-3">
-                                    <h4 className="font-bold text-vintage-text text-xl">{proj.name || "Project Name"}</h4>
+                                <div key={idx} className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D9D9D9]">
+                                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2 border-b border-[#D9D9D9] pb-3">
+                                    <h4 className="font-bold text-[#222222] text-xl">{proj.name || "Project Name"}</h4>
                                     {proj.tech && (
-                                      <span className="text-sm font-sans bg-vintage-secondary/30 px-3 py-1 rounded-full text-vintage-primary font-bold">
+                                      <span className="text-sm font-sans bg-[#FFE394] px-3 py-1 rounded-full text-[#F48F68] font-bold">
                                         {proj.tech}
                                       </span>
                                     )}
                                   </div>
-                                  <p className="whitespace-pre-wrap text-base opacity-90">{proj.description}</p>
+                                  <p className="whitespace-pre-wrap text-base text-[#222222]">{proj.description}</p>
                                 </div>
                               ))}
                             </div>
@@ -979,12 +1032,12 @@ export default function ResumeAnalyzer() {
                         {/* Skills */}
                         {generatedResumeData?.skillsList && (
                           <div className="space-y-4">
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Skills</h3>
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-[#F48F68] border-b border-[#D9D9D9] pb-2">Skills</h3>
                             <div className="flex flex-wrap gap-2 font-sans">
                               {generatedResumeData.skillsList.split('\n').map((skill: string, idx: number) => {
                                 const cleanSkill = skill.replace(/^[•*-]\s*/, '').trim();
                                 return cleanSkill ? (
-                                  <span key={idx} className="bg-vintage-secondary/20 border border-vintage-secondary/50 px-4 py-1.5 rounded-full text-sm font-bold text-vintage-text/90 shadow-sm hover:shadow-md transition-shadow">
+                                  <span key={idx} className="bg-[#FFE394] border border-[#D9D9D9] px-4 py-1.5 rounded-full text-sm font-bold text-[#222222]">
                                     {cleanSkill}
                                   </span>
                                 ) : null;
@@ -996,15 +1049,15 @@ export default function ResumeAnalyzer() {
                         {/* Education */}
                         {generatedResumeData?.validEdu?.length > 0 && (
                           <div className="space-y-4">
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Education</h3>
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-[#F48F68] border-b border-[#D9D9D9] pb-2">Education</h3>
                             <div className="space-y-4">
                               {generatedResumeData.validEdu.map((edu: any, idx: number) => (
-                                <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white/40 p-4 rounded-xl border border-vintage-secondary/20">
+                                <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-[#FFFFFF] p-4 rounded-xl border border-[#D9D9D9]">
                                   <div>
-                                    <h4 className="font-bold text-vintage-text text-lg">{edu.degree || "Degree"}</h4>
-                                    <p className="opacity-90">{edu.institution || "Institution"}</p>
+                                    <h4 className="font-bold text-[#222222] text-lg">{edu.degree || "Degree"}</h4>
+                                    <p className="text-[#222222]">{edu.institution || "Institution"}</p>
                                   </div>
-                                  {edu.year && <span className="text-sm font-sans font-bold text-vintage-primary opacity-80 bg-vintage-secondary/20 px-3 py-1 rounded-full mt-2 sm:mt-0">{edu.year}</span>}
+                                  {edu.year && <span className="text-sm font-sans font-bold text-[#F48F68] bg-[#FFE394] px-3 py-1 rounded-full mt-2 sm:mt-0">{edu.year}</span>}
                                 </div>
                               ))}
                             </div>
