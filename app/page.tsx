@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Upload, FileText, CheckCircle, AlertCircle, TrendingUp, 
-  Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X 
+  Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X,
+  User, Briefcase, GraduationCap, Copy, Check
 } from "lucide-react";
 
 export default function ResumeAnalyzer() {
@@ -21,6 +22,18 @@ export default function ResumeAnalyzer() {
     improvements: string[];
     coverLetter: string;
   } | null>(null);
+
+  // Builder State
+  const [builderData, setBuilderData] = useState({
+    fullName: "",
+    jobTitle: "",
+    skills: "",
+    experience: "",
+    education: ""
+  });
+  const [isBuilding, setIsBuilding] = useState(false);
+  const [generatedResume, setGeneratedResume] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +71,25 @@ export default function ResumeAnalyzer() {
       });
       setIsAnalyzing(false);
     }, 2500);
+  };
+
+  const handleBuildResume = () => {
+    if (!builderData.fullName) return;
+    setIsBuilding(true);
+    setGeneratedResume(null);
+
+    setTimeout(() => {
+      setGeneratedResume(`${builderData.fullName.toUpperCase()}\n${builderData.jobTitle}\n\nSUMMARY\nDedicated and results-driven professional with a proven track record of success. Skilled in driving projects from conception to completion while maintaining the highest quality standards.\n\nSKILLS\n${builderData.skills || "N/A"}\n\nEXPERIENCE\n${builderData.experience || "N/A"}\n\nEDUCATION\n${builderData.education || "N/A"}`);
+      setIsBuilding(false);
+    }, 2500);
+  };
+
+  const handleCopy = () => {
+    if (generatedResume) {
+      navigator.clipboard.writeText(generatedResume);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const fadeInUp = {
@@ -443,6 +475,126 @@ export default function ResumeAnalyzer() {
                     </h3>
                     <div className="bg-vintage-bg/40 p-8 rounded-[1.5rem] whitespace-pre-wrap font-serif text-lg leading-[1.8] border border-vintage-secondary/30 text-vintage-text/90">
                       {results.coverLetter}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </section>
+
+        {/* AI Resume Builder Section */}
+        <section id="builder" className="py-24 bg-white/30 border-t border-vintage-secondary/20">
+          <div className="max-w-4xl mx-auto px-6 md:px-12 space-y-12">
+            <motion.div {...fadeInUp} className="text-center space-y-4">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">AI Resume Builder</h2>
+              <p className="opacity-70 max-w-xl mx-auto text-lg">Generate a professional one-page resume instantly by providing your details.</p>
+            </motion.div>
+            
+            <motion.div {...fadeInUp} className="bg-white rounded-[2rem] p-8 md:p-12 shadow-xl border border-vintage-secondary/50 space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-vintage-secondary via-vintage-primary to-vintage-accent" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><User className="w-4 h-4 text-vintage-primary" /> Full Name</label>
+                  <input
+                    type="text"
+                    value={builderData.fullName}
+                    onChange={(e) => setBuilderData({...builderData, fullName: e.target.value})}
+                    placeholder="e.g. Jane Doe"
+                    className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Job Title</label>
+                  <input
+                    type="text"
+                    value={builderData.jobTitle}
+                    onChange={(e) => setBuilderData({...builderData, jobTitle: e.target.value})}
+                    placeholder="e.g. Software Engineer"
+                    className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Target className="w-4 h-4 text-vintage-primary" /> Skills</label>
+                <textarea
+                  value={builderData.skills}
+                  onChange={(e) => setBuilderData({...builderData, skills: e.target.value})}
+                  placeholder="e.g. React, TypeScript, Next.js"
+                  rows={2}
+                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Experience</label>
+                <textarea
+                  value={builderData.experience}
+                  onChange={(e) => setBuilderData({...builderData, experience: e.target.value})}
+                  placeholder="Briefly describe your work history..."
+                  rows={3}
+                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><GraduationCap className="w-4 h-4 text-vintage-primary" /> Education</label>
+                <textarea
+                  value={builderData.education}
+                  onChange={(e) => setBuilderData({...builderData, education: e.target.value})}
+                  placeholder="Your educational background..."
+                  rows={2}
+                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
+                />
+              </div>
+
+              <button
+                onClick={handleBuildResume}
+                disabled={!builderData.fullName || isBuilding}
+                className="w-full mt-4 py-5 bg-vintage-text hover:bg-opacity-90 text-white rounded-full font-bold text-lg flex items-center justify-center space-x-3 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-lg disabled:hover:shadow-none hover:-translate-y-1 disabled:hover:translate-y-0"
+              >
+                {isBuilding ? (
+                  <>
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <span>Generating Resume...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-6 h-6 text-vintage-secondary" />
+                    <span>Generate Resume</span>
+                  </>
+                )}
+              </button>
+            </motion.div>
+
+            <AnimatePresence>
+              {generatedResume && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0, y: 20 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -20 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="space-y-6 pt-4"
+                >
+                  <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-vintage-secondary/40">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 border-b border-vintage-secondary/30 pb-6">
+                      <h3 className="text-2xl font-extrabold flex items-center gap-3">
+                        <FileText className="w-7 h-7 text-vintage-primary" />
+                        Your Professional Resume
+                      </h3>
+                      <button 
+                        onClick={handleCopy}
+                        className="px-5 py-2.5 bg-vintage-secondary/30 hover:bg-vintage-secondary/50 text-vintage-text font-bold rounded-full text-sm flex items-center gap-2 transition-colors"
+                      >
+                        {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                        {copied ? "Copied!" : "Copy Resume"}
+                      </button>
+                    </div>
+                    
+                    <div className="bg-vintage-bg/40 p-8 md:p-10 rounded-[1.5rem] whitespace-pre-wrap font-serif text-lg leading-[1.8] border border-vintage-secondary/30 text-vintage-text/90">
+                      {generatedResume}
                     </div>
                   </div>
                 </motion.div>
