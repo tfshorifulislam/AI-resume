@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, CheckCircle, AlertCircle, TrendingUp,
   Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X,
-  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Link, Plus, Trash2
+  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Link, Plus, Trash2, Code
 } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -36,13 +36,16 @@ export default function ResumeAnalyzer() {
     linkedin: "",
     objective: "",
     skills: "",
+    projects: [
+      { name: "", tech: "", description: "" }
+    ],
     education: [
       { degree: "", institution: "", year: "" }
     ]
   });
   const [isBuilding, setIsBuilding] = useState(false);
   const [generatedResume, setGeneratedResume] = useState<string | null>(null);
-  const [generatedResumeBody, setGeneratedResumeBody] = useState<string | null>(null);
+  const [generatedResumeData, setGeneratedResumeData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -96,6 +99,19 @@ export default function ResumeAnalyzer() {
     setBuilderData({ ...builderData, education: newEdu });
   };
 
+  const handleAddProject = () => {
+    setBuilderData({
+      ...builderData,
+      projects: [...builderData.projects, { name: "", tech: "", description: "" }]
+    });
+  };
+
+  const handleRemoveProject = (index: number) => {
+    const newProj = [...builderData.projects];
+    newProj.splice(index, 1);
+    setBuilderData({ ...builderData, projects: newProj });
+  };
+
   const handleBuildResume = () => {
     if (!builderData.fullName) return;
     setIsBuilding(true);
@@ -121,6 +137,14 @@ export default function ResumeAnalyzer() {
         formattedEdu = "Bachelor of Science\nUniversity of Technology - Graduated with Honors";
       }
 
+      let formattedProj = "";
+      const validProj = builderData.projects.filter(p => p.name || p.tech || p.description);
+      if (validProj.length > 0) {
+        formattedProj = validProj.map(p => `• ${p.name || "Project"} ${p.tech ? `[${p.tech}]` : ""}\n  ${p.description || "Developed and deployed key features."}`).join('\n\n');
+      } else {
+        formattedProj = "• E-Commerce Platform [React, Node.js]\n  Built a full-stack platform.\n  Increased sales by 20%.";
+      }
+
       const location = builderData.location || "San Francisco, CA";
       const email = builderData.email || "hello@example.com";
       const phone = builderData.phone || "555-0100";
@@ -133,12 +157,23 @@ export default function ResumeAnalyzer() {
 
       const contactInfo = `📍 ${location}  |  ✉️ ${email}  |  📞 ${phone}${links ? `\n${links}` : ""}`;
 
-      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n${contactInfo}\n\nCAREER OBJECTIVE\n${objective}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nEDUCATION\n${formattedEdu}`;
-      
-      const bodyText = `CAREER OBJECTIVE\n${objective}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nEDUCATION\n${formattedEdu}`;
+      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n${contactInfo}\n\nCAREER OBJECTIVE\n${objective}\n\nPROJECTS\n${formattedProj}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nEDUCATION\n${formattedEdu}`;
 
       setGeneratedResume(atsResume);
-      setGeneratedResumeBody(bodyText);
+      setGeneratedResumeData({
+        fullName: name,
+        tagline: title,
+        email: builderData.email,
+        phone: builderData.phone,
+        location: builderData.location,
+        portfolio: builderData.portfolio,
+        github: builderData.github,
+        linkedin: builderData.linkedin,
+        objective: objective,
+        skillsList: skillsList,
+        validEdu: validEdu.length > 0 ? validEdu : [{ degree: "Bachelor of Science", institution: "University of Technology", year: "Graduated with Honors" }],
+        validProj: validProj.length > 0 ? validProj : [{ name: "E-Commerce Platform", tech: "React, Node.js", description: "Built a full-stack platform.\nIncreased sales by 20%." }]
+      });
       setIsBuilding(false);
     }, 2500);
   };
@@ -658,6 +693,77 @@ export default function ResumeAnalyzer() {
                 />
               </div>
 
+              {/* Projects */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-vintage-secondary/30 pb-2">
+                  <h3 className="text-xl font-bold flex items-center gap-2"><Code className="w-5 h-5 text-vintage-primary" /> Projects</h3>
+                  <button 
+                    onClick={handleAddProject}
+                    className="flex items-center gap-2 text-sm font-bold text-vintage-primary hover:text-[#E57A54] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Add Project
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {builderData.projects.map((proj, idx) => (
+                    <div key={`proj-${idx}`} className="bg-vintage-bg/30 p-6 rounded-2xl border border-vintage-secondary/30 shadow-sm relative group">
+                      {builderData.projects.length > 1 && (
+                        <button 
+                          onClick={() => handleRemoveProject(idx)}
+                          className="absolute top-4 right-4 text-vintage-text/40 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider opacity-70">Project Name</label>
+                          <input
+                            type="text"
+                            value={proj.name}
+                            onChange={(e) => {
+                              const newProj = [...builderData.projects];
+                              newProj[idx].name = e.target.value;
+                              setBuilderData({ ...builderData, projects: newProj });
+                            }}
+                            placeholder="e.g. E-Commerce Platform"
+                            className="w-full px-4 py-2.5 rounded-xl border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 bg-white shadow-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider opacity-70">Technologies Used</label>
+                          <input
+                            type="text"
+                            value={proj.tech}
+                            onChange={(e) => {
+                              const newProj = [...builderData.projects];
+                              newProj[idx].tech = e.target.value;
+                              setBuilderData({ ...builderData, projects: newProj });
+                            }}
+                            placeholder="e.g. React, Node.js"
+                            className="w-full px-4 py-2.5 rounded-xl border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 bg-white shadow-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider opacity-70">Description (2-4 bullet points)</label>
+                          <textarea
+                            value={proj.description}
+                            onChange={(e) => {
+                              const newProj = [...builderData.projects];
+                              newProj[idx].description = e.target.value;
+                              setBuilderData({ ...builderData, projects: newProj });
+                            }}
+                            placeholder="• Built a full-stack platform...&#10;• Increased sales by 20%..."
+                            rows={3}
+                            className="w-full px-4 py-2.5 rounded-xl border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 bg-white shadow-sm resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Skills */}
               <div className="space-y-3">
                 <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Target className="w-4 h-4 text-vintage-primary" /> Skills</label>
@@ -839,8 +945,71 @@ export default function ResumeAnalyzer() {
                       </div>
 
                       {/* Body */}
-                      <div className="whitespace-pre-wrap font-serif text-lg leading-[1.8]">
-                        {generatedResumeBody}
+                      <div className="font-serif text-lg leading-[1.8] space-y-8 mt-6">
+                        {/* Career Objective */}
+                        {generatedResumeData?.objective && (
+                          <div className="space-y-3">
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Career Objective</h3>
+                            <p className="whitespace-pre-wrap">{generatedResumeData.objective}</p>
+                          </div>
+                        )}
+
+                        {/* Projects */}
+                        {generatedResumeData?.validProj?.length > 0 && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Projects</h3>
+                            <div className="space-y-4">
+                              {generatedResumeData.validProj.map((proj: any, idx: number) => (
+                                <div key={idx} className="bg-white/60 p-5 rounded-2xl border border-vintage-secondary/30 shadow-sm">
+                                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2 border-b border-vintage-secondary/20 pb-3">
+                                    <h4 className="font-bold text-vintage-text text-xl">{proj.name || "Project Name"}</h4>
+                                    {proj.tech && (
+                                      <span className="text-sm font-sans bg-vintage-secondary/30 px-3 py-1 rounded-full text-vintage-primary font-bold">
+                                        {proj.tech}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="whitespace-pre-wrap text-base opacity-90">{proj.description}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Skills */}
+                        {generatedResumeData?.skillsList && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Skills</h3>
+                            <div className="flex flex-wrap gap-2 font-sans">
+                              {generatedResumeData.skillsList.split('\n').map((skill: string, idx: number) => {
+                                const cleanSkill = skill.replace(/^[•*-]\s*/, '').trim();
+                                return cleanSkill ? (
+                                  <span key={idx} className="bg-vintage-secondary/20 border border-vintage-secondary/50 px-4 py-1.5 rounded-full text-sm font-bold text-vintage-text/90 shadow-sm hover:shadow-md transition-shadow">
+                                    {cleanSkill}
+                                  </span>
+                                ) : null;
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Education */}
+                        {generatedResumeData?.validEdu?.length > 0 && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-vintage-primary border-b border-vintage-secondary/30 pb-2">Education</h3>
+                            <div className="space-y-4">
+                              {generatedResumeData.validEdu.map((edu: any, idx: number) => (
+                                <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white/40 p-4 rounded-xl border border-vintage-secondary/20">
+                                  <div>
+                                    <h4 className="font-bold text-vintage-text text-lg">{edu.degree || "Degree"}</h4>
+                                    <p className="opacity-90">{edu.institution || "Institution"}</p>
+                                  </div>
+                                  {edu.year && <span className="text-sm font-sans font-bold text-vintage-primary opacity-80 bg-vintage-secondary/20 px-3 py-1 rounded-full mt-2 sm:mt-0">{edu.year}</span>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
