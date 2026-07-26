@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Upload, FileText, CheckCircle, AlertCircle, TrendingUp, 
+import {
+  Upload, FileText, CheckCircle, AlertCircle, TrendingUp,
   Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X,
   User, Briefcase, GraduationCap, Copy, Check
 } from "lucide-react";
@@ -14,7 +14,7 @@ export default function ResumeAnalyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const [results, setResults] = useState<{
     resumeScore: number;
     atsScore: number;
@@ -79,7 +79,34 @@ export default function ResumeAnalyzer() {
     setGeneratedResume(null);
 
     setTimeout(() => {
-      setGeneratedResume(`${builderData.fullName.toUpperCase()}\n${builderData.jobTitle}\n\nSUMMARY\nDedicated and results-driven professional with a proven track record of success. Skilled in driving projects from conception to completion while maintaining the highest quality standards.\n\nSKILLS\n${builderData.skills || "N/A"}\n\nEXPERIENCE\n${builderData.experience || "N/A"}\n\nEDUCATION\n${builderData.education || "N/A"}`);
+      const name = builderData.fullName.toUpperCase();
+      const title = builderData.jobTitle || "Professional";
+      
+      const summary = `Results-driven and highly motivated ${title} with a proven track record of delivering high-impact solutions. Adept at leveraging technical and analytical skills to optimize processes, improve efficiency, and drive project success. Strong communicator and collaborative team player dedicated to achieving organizational objectives and exceeding performance goals.`;
+      
+      const skillsList = builderData.skills 
+        ? builderData.skills.split(',').map(s => `• ${s.trim()}`).join('\n')
+        : "• Strategic Planning\n• Project Management\n• Cross-functional Collaboration\n• Problem Solving\n• Data Analysis";
+
+      const expInput = builderData.experience ? builderData.experience.trim() : "";
+      let formattedExp = "";
+      if (expInput) {
+        const lines = expInput.split('\n').filter(l => l.trim().length > 0);
+        formattedExp = lines.map(line => {
+          const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
+          return `• Spearheaded initiatives related to ${cleanLine}, resulting in measurable improvements in workflow efficiency.\n• Collaborated closely with cross-functional teams to ensure all deliverables met rigorous quality standards.\n• Consistently exceeded performance metrics through proactive problem-solving and strategic execution.`;
+        }).join('\n\n');
+      } else {
+        formattedExp = "• Successfully managed and executed key projects, consistently meeting deadlines and exceeding expectations.\n• Developed and implemented strategic initiatives that drove a 15% increase in operational efficiency.\n• Mentored junior team members and fostered a collaborative, high-performance work environment.";
+      }
+
+      const formattedEdu = builderData.education 
+        ? builderData.education.trim() 
+        : "Bachelor of Science\nUniversity of Technology - Graduated with Honors";
+
+      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n📍 San Francisco, CA  |  ✉️ hello@example.com  |  🔗 linkedin.com/in/profile\n\nPROFESSIONAL SUMMARY\n${summary}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nPROJECTS OR WORK EXPERIENCE\n${formattedExp}\n\nEDUCATION\n${formattedEdu}\n\nCERTIFICATIONS OR TRAINING\n• Professional Certification in ${title}\n• Advanced Training in Agile Methodologies & Leadership`;
+
+      setGeneratedResume(atsResume);
       setIsBuilding(false);
     }, 2500);
   };
@@ -110,27 +137,26 @@ export default function ResumeAnalyzer() {
 
 
       {/* Sticky Navbar */}
-      <nav 
-        className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
-          isScrolled 
-            ? "bg-white/80 backdrop-blur-xl border-vintage-secondary/40 shadow-sm py-4" 
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${isScrolled
+            ? "bg-white/80 backdrop-blur-xl border-vintage-secondary/40 shadow-sm py-4"
             : "bg-transparent border-transparent py-6"
-        }`}
+          }`}
       >
         <div className="max-w-6xl mx-auto px-6 md:px-12 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-2xl tracking-tight text-vintage-text">
             <Sparkles className="w-6 h-6 text-vintage-primary" />
             ResumeMint AI
           </div>
-          
+
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold opacity-80">
             <a href="#features" className="hover:text-vintage-primary transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-vintage-primary transition-colors">How It Works</a>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-4">
-            <a 
-              href="#analyzer" 
+            <a
+              href="#analyzer"
               className="px-6 py-3 bg-vintage-primary text-white rounded-full font-bold hover:bg-[#E57A54] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-sm"
             >
               Analyze Resume
@@ -138,7 +164,7 @@ export default function ResumeAnalyzer() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button 
+          <button
             className="md:hidden p-2 text-vintage-text"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -149,7 +175,7 @@ export default function ResumeAnalyzer() {
         {/* Mobile Menu Content */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -168,7 +194,7 @@ export default function ResumeAnalyzer() {
       <main className="relative z-10 pt-32">
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-20 grid lg:grid-cols-2 gap-16 items-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
@@ -178,15 +204,15 @@ export default function ResumeAnalyzer() {
               <Sparkles className="w-4 h-4 text-vintage-primary" />
               ✨ AI Resume Analyzer
             </div>
-            
+
             <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
               Build a Better <br className="hidden lg:block" /> Resume with AI
             </h1>
-            
+
             <p className="text-lg opacity-80 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               Upload your resume, receive instant AI feedback, improve your ATS score, and generate a professional cover letter in seconds.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
               <a href="#analyzer" className="w-full sm:w-auto px-8 py-4 bg-vintage-text text-white rounded-full font-bold hover:bg-opacity-90 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
                 Upload Resume <ArrowRight className="w-5 h-5" />
@@ -195,7 +221,7 @@ export default function ResumeAnalyzer() {
                 Learn More
               </a>
             </div>
-            
+
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 pt-6 text-sm font-semibold opacity-75">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-vintage-primary" /> ATS Friendly
@@ -208,15 +234,15 @@ export default function ResumeAnalyzer() {
               </div>
             </div>
           </motion.div>
-          
+
           {/* Hero Right Side - Floating Card */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
             className="relative flex justify-center items-center lg:justify-end"
           >
-            <motion.div 
+            <motion.div
               animate={{ y: [-8, 8, -8] }}
               transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
               className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white space-y-8"
@@ -251,7 +277,7 @@ export default function ResumeAnalyzer() {
                   <span className="px-3 py-1.5 bg-white rounded-lg text-xs font-bold border border-vintage-secondary/50 shadow-sm">React Testing</span>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="text-sm font-bold flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-vintage-accent" /> Improvement Tips
@@ -271,7 +297,7 @@ export default function ResumeAnalyzer() {
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">How It Works</h2>
               <p className="opacity-70 max-w-xl mx-auto text-lg">Get your resume optimized and a custom cover letter generated in four simple steps.</p>
             </motion.div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 { title: "Upload Resume", icon: Upload, desc: "Upload your existing resume securely in PDF format." },
@@ -279,8 +305,8 @@ export default function ResumeAnalyzer() {
                 { title: "Improve Resume", icon: Zap, desc: "Apply tailored feedback and add suggested missing skills." },
                 { title: "Generate Letter", icon: FileText, desc: "Automatically craft a highly targeted cover letter." },
               ].map((step, i) => (
-                <motion.div 
-                  key={i} 
+                <motion.div
+                  key={i}
                   {...fadeInUp}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   whileHover={{ y: -5 }}
@@ -304,7 +330,7 @@ export default function ResumeAnalyzer() {
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Everything You Need</h2>
               <p className="opacity-70 max-w-xl mx-auto text-lg">Powerful AI tools designed to help you land your dream job faster.</p>
             </motion.div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
                 { title: "Resume Score", icon: TrendingUp, desc: "Get a comprehensive score based on industry standards, formatting, and keyword optimization best practices." },
@@ -312,8 +338,8 @@ export default function ResumeAnalyzer() {
                 { title: "Missing Skills", icon: AlertCircle, desc: "Identify key skills missing from your profile based on real-time analysis of your target job role." },
                 { title: "Cover Letter Generator", icon: PenTool, desc: "Create tailored, professional cover letters instantly using AI that matches your resume to the job." },
               ].map((feat, i) => (
-                <motion.div 
-                  key={i} 
+                <motion.div
+                  key={i}
                   {...fadeInUp}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className="bg-white/90 p-8 md:p-10 rounded-3xl shadow-sm border border-vintage-secondary/40 flex flex-col sm:flex-row items-start gap-6 hover:shadow-md hover:-translate-y-1 transition-all duration-300 h-full"
@@ -338,11 +364,11 @@ export default function ResumeAnalyzer() {
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Try ResumeMint AI</h2>
               <p className="opacity-70 max-w-xl mx-auto text-lg">Upload your resume below to experience the magic firsthand.</p>
             </motion.div>
-            
+
             {/* Upload & Input Container */}
             <motion.div {...fadeInUp} className="bg-white rounded-[2rem] p-8 md:p-12 shadow-xl border border-vintage-secondary/50 space-y-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-vintage-primary via-vintage-secondary to-vintage-accent" />
-              
+
               {/* File Upload */}
               <div className="space-y-3">
                 <label className="block text-sm font-bold ml-1 uppercase tracking-wider opacity-80">Upload Resume (PDF)</label>
@@ -399,7 +425,7 @@ export default function ResumeAnalyzer() {
             {/* Results Section */}
             <AnimatePresence>
               {results && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, height: 0, y: 20 }}
                   animate={{ opacity: 1, height: "auto", y: 0 }}
                   exit={{ opacity: 0, height: 0, y: -20 }}
@@ -490,17 +516,17 @@ export default function ResumeAnalyzer() {
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">AI Resume Builder</h2>
               <p className="opacity-70 max-w-xl mx-auto text-lg">Generate a professional one-page resume instantly by providing your details.</p>
             </motion.div>
-            
+
             <motion.div {...fadeInUp} className="bg-white rounded-[2rem] p-8 md:p-12 shadow-xl border border-vintage-secondary/50 space-y-6 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-vintage-secondary via-vintage-primary to-vintage-accent" />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><User className="w-4 h-4 text-vintage-primary" /> Full Name</label>
                   <input
                     type="text"
                     value={builderData.fullName}
-                    onChange={(e) => setBuilderData({...builderData, fullName: e.target.value})}
+                    onChange={(e) => setBuilderData({ ...builderData, fullName: e.target.value })}
                     placeholder="e.g. Jane Doe"
                     className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
                   />
@@ -510,7 +536,7 @@ export default function ResumeAnalyzer() {
                   <input
                     type="text"
                     value={builderData.jobTitle}
-                    onChange={(e) => setBuilderData({...builderData, jobTitle: e.target.value})}
+                    onChange={(e) => setBuilderData({ ...builderData, jobTitle: e.target.value })}
                     placeholder="e.g. Software Engineer"
                     className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
                   />
@@ -521,7 +547,7 @@ export default function ResumeAnalyzer() {
                 <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Target className="w-4 h-4 text-vintage-primary" /> Skills</label>
                 <textarea
                   value={builderData.skills}
-                  onChange={(e) => setBuilderData({...builderData, skills: e.target.value})}
+                  onChange={(e) => setBuilderData({ ...builderData, skills: e.target.value })}
                   placeholder="e.g. React, TypeScript, Next.js"
                   rows={2}
                   className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
@@ -532,7 +558,7 @@ export default function ResumeAnalyzer() {
                 <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Experience</label>
                 <textarea
                   value={builderData.experience}
-                  onChange={(e) => setBuilderData({...builderData, experience: e.target.value})}
+                  onChange={(e) => setBuilderData({ ...builderData, experience: e.target.value })}
                   placeholder="Briefly describe your work history..."
                   rows={3}
                   className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
@@ -543,7 +569,7 @@ export default function ResumeAnalyzer() {
                 <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><GraduationCap className="w-4 h-4 text-vintage-primary" /> Education</label>
                 <textarea
                   value={builderData.education}
-                  onChange={(e) => setBuilderData({...builderData, education: e.target.value})}
+                  onChange={(e) => setBuilderData({ ...builderData, education: e.target.value })}
                   placeholder="Your educational background..."
                   rows={2}
                   className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
@@ -571,7 +597,7 @@ export default function ResumeAnalyzer() {
 
             <AnimatePresence>
               {generatedResume && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, height: 0, y: 20 }}
                   animate={{ opacity: 1, height: "auto", y: 0 }}
                   exit={{ opacity: 0, height: 0, y: -20 }}
@@ -584,7 +610,7 @@ export default function ResumeAnalyzer() {
                         <FileText className="w-7 h-7 text-vintage-primary" />
                         Your Professional Resume
                       </h3>
-                      <button 
+                      <button
                         onClick={handleCopy}
                         className="px-5 py-2.5 bg-vintage-secondary/30 hover:bg-vintage-secondary/50 text-vintage-text font-bold rounded-full text-sm flex items-center gap-2 transition-colors"
                       >
@@ -592,7 +618,7 @@ export default function ResumeAnalyzer() {
                         {copied ? "Copied!" : "Copy Resume"}
                       </button>
                     </div>
-                    
+
                     <div className="bg-vintage-bg/40 p-8 md:p-10 rounded-[1.5rem] whitespace-pre-wrap font-serif text-lg leading-[1.8] border border-vintage-secondary/30 text-vintage-text/90">
                       {generatedResume}
                     </div>
@@ -605,7 +631,7 @@ export default function ResumeAnalyzer() {
       </main>
 
       {/* Footer */}
-      <motion.footer 
+      <motion.footer
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -623,7 +649,7 @@ export default function ResumeAnalyzer() {
                 Build stronger resumes and professional cover letters with AI.
               </p>
             </div>
-            
+
             <div className="space-y-6">
               <h4 className="font-extrabold text-lg uppercase tracking-wider opacity-90">Quick Links</h4>
               <ul className="space-y-3 text-base opacity-80 font-semibold">
@@ -642,7 +668,7 @@ export default function ResumeAnalyzer() {
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t-2 border-vintage-secondary/30 flex flex-col md:flex-row items-center justify-between gap-6 text-sm opacity-60 font-bold">
             <p>© {new Date().getFullYear()} ResumeMint AI. All rights reserved.</p>
             <p>Built with Next.js, TypeScript & AI.</p>
