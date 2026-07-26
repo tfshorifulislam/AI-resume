@@ -807,25 +807,34 @@ export default function ResumeAnalyzer() {
                         </div>
 
                         {/* Right Side */}
-                        <div className="flex flex-col md:items-end gap-2 text-sm font-medium opacity-90">
+                        <div className="flex flex-col md:items-end gap-2 text-sm font-medium opacity-90 mt-4 md:mt-0">
                           {builderData.location && (
                             <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-vintage-primary" /> {builderData.location}</div>
                           )}
-                          {builderData.portfolio && (
-                            <a href={builderData.portfolio} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-vintage-primary transition-colors">
-                              <Link className="w-4 h-4 text-vintage-primary" /> Portfolio
-                            </a>
-                          )}
-                          {builderData.github && (
-                            <a href={builderData.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-vintage-primary transition-colors">
-                              <FaGithub className="w-4 h-4 text-vintage-primary" /> GitHub
-                            </a>
-                          )}
-                          {builderData.linkedin && (
-                            <a href={builderData.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-vintage-primary transition-colors">
-                              <FaLinkedin className="w-4 h-4 text-vintage-primary" /> LinkedIn
-                            </a>
-                          )}
+                          <div className="flex flex-wrap items-center md:justify-end gap-3 mt-1">
+                            {[
+                              builderData.portfolio && (
+                                <a key="portfolio" href={builderData.portfolio} target="_blank" rel="noopener noreferrer" className="hover:text-vintage-primary transition-colors">
+                                  Portfolio
+                                </a>
+                              ),
+                              builderData.github && (
+                                <a key="github" href={builderData.github} target="_blank" rel="noopener noreferrer" className="hover:text-vintage-primary transition-colors">
+                                  GitHub
+                                </a>
+                              ),
+                              builderData.linkedin && (
+                                <a key="linkedin" href={builderData.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-vintage-primary transition-colors">
+                                  LinkedIn
+                                </a>
+                              )
+                            ].filter(Boolean).map((link, index, array) => (
+                              <div key={index} className="flex items-center gap-3">
+                                {link}
+                                {index < array.length - 1 && <span className="text-vintage-text/40">|</span>}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
