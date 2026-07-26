@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, CheckCircle, AlertCircle, TrendingUp,
   Sparkles, File, Loader2, ArrowRight, Zap, Target, PenTool, LayoutDashboard, Menu, X,
-  User, Briefcase, GraduationCap, Copy, Check
+  User, Briefcase, GraduationCap, Copy, Check, Mail, Phone, MapPin, Award, Code
 } from "lucide-react";
 
 export default function ResumeAnalyzer() {
@@ -27,9 +27,25 @@ export default function ResumeAnalyzer() {
   const [builderData, setBuilderData] = useState({
     fullName: "",
     jobTitle: "",
+    email: "",
+    phone: "",
+    location: "",
+    summary: "",
     skills: "",
-    experience: "",
-    education: ""
+    projects: [
+      { name: "", tech: "", description: "" },
+      { name: "", tech: "", description: "" },
+      { name: "", tech: "", description: "" }
+    ],
+    experience: [
+      { company: "", title: "", duration: "", responsibilities: "" },
+      { company: "", title: "", duration: "", responsibilities: "" }
+    ],
+    education: [
+      { degree: "", institution: "", year: "" },
+      { degree: "", institution: "", year: "" }
+    ],
+    certifications: ""
   });
   const [isBuilding, setIsBuilding] = useState(false);
   const [generatedResume, setGeneratedResume] = useState<string | null>(null);
@@ -82,29 +98,57 @@ export default function ResumeAnalyzer() {
       const name = builderData.fullName.toUpperCase();
       const title = builderData.jobTitle || "Professional";
       
-      const summary = `Results-driven and highly motivated ${title} with a proven track record of delivering high-impact solutions. Adept at leveraging technical and analytical skills to optimize processes, improve efficiency, and drive project success. Strong communicator and collaborative team player dedicated to achieving organizational objectives and exceeding performance goals.`;
+      const summary = builderData.summary 
+        ? builderData.summary.trim() 
+        : `Results-driven and highly motivated ${title} with a proven track record of delivering high-impact solutions. Adept at leveraging technical and analytical skills to optimize processes, improve efficiency, and drive project success. Strong communicator and collaborative team player dedicated to achieving organizational objectives and exceeding performance goals.`;
       
       const skillsList = builderData.skills 
         ? builderData.skills.split(',').map(s => `• ${s.trim()}`).join('\n')
         : "• Strategic Planning\n• Project Management\n• Cross-functional Collaboration\n• Problem Solving\n• Data Analysis";
 
-      const expInput = builderData.experience ? builderData.experience.trim() : "";
       let formattedExp = "";
-      if (expInput) {
-        const lines = expInput.split('\n').filter(l => l.trim().length > 0);
-        formattedExp = lines.map(line => {
-          const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
-          return `• Spearheaded initiatives related to ${cleanLine}, resulting in measurable improvements in workflow efficiency.\n• Collaborated closely with cross-functional teams to ensure all deliverables met rigorous quality standards.\n• Consistently exceeded performance metrics through proactive problem-solving and strategic execution.`;
+      const validExp = builderData.experience.filter(e => e.company || e.title || e.responsibilities);
+      if (validExp.length > 0) {
+        formattedExp = validExp.map(e => {
+          let str = `${e.title || "Role"} at ${e.company || "Company"}${e.duration ? ` (${e.duration})` : ""}\n`;
+          const resp = e.responsibilities ? e.responsibilities.split('\n').filter(l => l.trim().length > 0) : [];
+          if (resp.length > 0) {
+            str += resp.map(r => `• ${r.trim().replace(/^[-•*]\s*/, '')}`).join('\n');
+          } else {
+            str += `• Spearheaded initiatives resulting in measurable improvements.\n• Collaborated closely with cross-functional teams.`;
+          }
+          return str;
         }).join('\n\n');
       } else {
         formattedExp = "• Successfully managed and executed key projects, consistently meeting deadlines and exceeding expectations.\n• Developed and implemented strategic initiatives that drove a 15% increase in operational efficiency.\n• Mentored junior team members and fostered a collaborative, high-performance work environment.";
       }
 
-      const formattedEdu = builderData.education 
-        ? builderData.education.trim() 
-        : "Bachelor of Science\nUniversity of Technology - Graduated with Honors";
+      let formattedProj = "";
+      const validProj = builderData.projects.filter(p => p.name || p.tech || p.description);
+      if (validProj.length > 0) {
+        formattedProj = validProj.map(p => {
+          return `• ${p.name || "Project"} ${p.tech ? `[${p.tech}]` : ""}\n  ${p.description || "Developed and deployed key features."}`;
+        }).join('\n\n');
+        formattedExp = `${formattedProj}\n\nWORK EXPERIENCE\n${formattedExp}`;
+      }
 
-      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n📍 San Francisco, CA  |  ✉️ hello@example.com  |  🔗 linkedin.com/in/profile\n\nPROFESSIONAL SUMMARY\n${summary}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nPROJECTS OR WORK EXPERIENCE\n${formattedExp}\n\nEDUCATION\n${formattedEdu}\n\nCERTIFICATIONS OR TRAINING\n• Professional Certification in ${title}\n• Advanced Training in Agile Methodologies & Leadership`;
+      let formattedEdu = "";
+      const validEdu = builderData.education.filter(e => e.degree || e.institution);
+      if (validEdu.length > 0) {
+        formattedEdu = validEdu.map(e => `${e.degree || "Degree"} | ${e.institution || "Institution"} ${e.year ? `- ${e.year}` : ""}`).join('\n');
+      } else {
+        formattedEdu = "Bachelor of Science\nUniversity of Technology - Graduated with Honors";
+      }
+
+      const formattedCerts = builderData.certifications 
+        ? builderData.certifications.split('\n').filter(l=>l.trim().length>0).map(c => `• ${c.trim()}`).join('\n')
+        : `• Professional Certification in ${title}\n• Advanced Training in Agile Methodologies & Leadership`;
+
+      const location = builderData.location || "San Francisco, CA";
+      const email = builderData.email || "hello@example.com";
+      const phone = builderData.phone || "555-0100";
+
+      const atsResume = `${name}\n${title}\n\nCONTACT INFORMATION\n📍 ${location}  |  ✉️ ${email}  |  📞 ${phone}  |  🔗 linkedin.com/in/profile\n\nPROFESSIONAL SUMMARY\n${summary}\n\nTECHNICAL / PROFESSIONAL SKILLS\n${skillsList}\n\nPROJECTS OR WORK EXPERIENCE\n${formattedExp}\n\nEDUCATION\n${formattedEdu}\n\nCERTIFICATIONS OR TRAINING\n${formattedCerts}`;
 
       setGeneratedResume(atsResume);
       setIsBuilding(false);
@@ -520,57 +564,240 @@ export default function ResumeAnalyzer() {
             <motion.div {...fadeInUp} className="bg-white rounded-[2rem] p-8 md:p-12 shadow-xl border border-vintage-secondary/50 space-y-6 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-vintage-secondary via-vintage-primary to-vintage-accent" />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><User className="w-4 h-4 text-vintage-primary" /> Full Name</label>
-                  <input
-                    type="text"
-                    value={builderData.fullName}
-                    onChange={(e) => setBuilderData({ ...builderData, fullName: e.target.value })}
-                    placeholder="e.g. Jane Doe"
-                    className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Job Title</label>
-                  <input
-                    type="text"
-                    value={builderData.jobTitle}
-                    onChange={(e) => setBuilderData({ ...builderData, jobTitle: e.target.value })}
-                    placeholder="e.g. Software Engineer"
-                    className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
-                  />
+              {/* Personal Info */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2">Personal Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><User className="w-4 h-4 text-vintage-primary" /> Full Name</label>
+                    <input
+                      type="text"
+                      value={builderData.fullName}
+                      onChange={(e) => setBuilderData({ ...builderData, fullName: e.target.value })}
+                      placeholder="e.g. Jane Doe"
+                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Job Title</label>
+                    <input
+                      type="text"
+                      value={builderData.jobTitle}
+                      onChange={(e) => setBuilderData({ ...builderData, jobTitle: e.target.value })}
+                      placeholder="e.g. Software Engineer"
+                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Mail className="w-4 h-4 text-vintage-primary" /> Email Address</label>
+                    <input
+                      type="email"
+                      value={builderData.email}
+                      onChange={(e) => setBuilderData({ ...builderData, email: e.target.value })}
+                      placeholder="e.g. jane@example.com"
+                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Phone className="w-4 h-4 text-vintage-primary" /> Phone Number</label>
+                    <input
+                      type="tel"
+                      value={builderData.phone}
+                      onChange={(e) => setBuilderData({ ...builderData, phone: e.target.value })}
+                      placeholder="e.g. (555) 123-4567"
+                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                    />
+                  </div>
+                  <div className="space-y-3 md:col-span-2">
+                    <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><MapPin className="w-4 h-4 text-vintage-primary" /> Location</label>
+                    <input
+                      type="text"
+                      value={builderData.location}
+                      onChange={(e) => setBuilderData({ ...builderData, location: e.target.value })}
+                      placeholder="e.g. San Francisco, CA"
+                      className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium"
+                    />
+                  </div>
                 </div>
               </div>
 
+              {/* Summary */}
               <div className="space-y-3">
-                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Target className="w-4 h-4 text-vintage-primary" /> Skills</label>
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><FileText className="w-4 h-4 text-vintage-primary" /> Professional Summary</label>
                 <textarea
-                  value={builderData.skills}
-                  onChange={(e) => setBuilderData({ ...builderData, skills: e.target.value })}
-                  placeholder="e.g. React, TypeScript, Next.js"
-                  rows={2}
-                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Briefcase className="w-4 h-4 text-vintage-primary" /> Experience</label>
-                <textarea
-                  value={builderData.experience}
-                  onChange={(e) => setBuilderData({ ...builderData, experience: e.target.value })}
-                  placeholder="Briefly describe your work history..."
+                  value={builderData.summary}
+                  onChange={(e) => setBuilderData({ ...builderData, summary: e.target.value })}
+                  placeholder="Brief overview of your career and goals..."
                   rows={3}
                   className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
                 />
               </div>
 
+              {/* Skills */}
               <div className="space-y-3">
-                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><GraduationCap className="w-4 h-4 text-vintage-primary" /> Education</label>
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Target className="w-4 h-4 text-vintage-primary" /> Skills</label>
                 <textarea
-                  value={builderData.education}
-                  onChange={(e) => setBuilderData({ ...builderData, education: e.target.value })}
-                  placeholder="Your educational background..."
+                  value={builderData.skills}
+                  onChange={(e) => setBuilderData({ ...builderData, skills: e.target.value })}
+                  placeholder="React, Next.js, TypeScript, Node.js..."
+                  rows={2}
+                  className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
+                />
+              </div>
+
+              {/* Projects */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><Code className="w-5 h-5 text-vintage-primary" /> Projects</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[0, 1, 2].map((idx) => (
+                    <div key={`project-${idx}`} className="bg-vintage-bg/30 p-5 rounded-2xl border border-vintage-secondary/30 space-y-4">
+                      <div className="text-sm font-bold text-vintage-text/60">Project {idx + 1}</div>
+                      <input
+                        type="text"
+                        value={builderData.projects[idx].name}
+                        onChange={(e) => {
+                          const newProjects = [...builderData.projects];
+                          newProjects[idx].name = e.target.value;
+                          setBuilderData({ ...builderData, projects: newProjects });
+                        }}
+                        placeholder="Project Name"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <input
+                        type="text"
+                        value={builderData.projects[idx].tech}
+                        onChange={(e) => {
+                          const newProjects = [...builderData.projects];
+                          newProjects[idx].tech = e.target.value;
+                          setBuilderData({ ...builderData, projects: newProjects });
+                        }}
+                        placeholder="Technologies Used"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <textarea
+                        value={builderData.projects[idx].description}
+                        onChange={(e) => {
+                          const newProjects = [...builderData.projects];
+                          newProjects[idx].description = e.target.value;
+                          setBuilderData({ ...builderData, projects: newProjects });
+                        }}
+                        placeholder="Project Description..."
+                        rows={3}
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 resize-none"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><Briefcase className="w-5 h-5 text-vintage-primary" /> Work Experience</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[0, 1].map((idx) => (
+                    <div key={`exp-${idx}`} className="bg-vintage-bg/30 p-5 rounded-2xl border border-vintage-secondary/30 space-y-4">
+                      <div className="text-sm font-bold text-vintage-text/60">Experience {idx + 1}</div>
+                      <input
+                        type="text"
+                        value={builderData.experience[idx].company}
+                        onChange={(e) => {
+                          const newExp = [...builderData.experience];
+                          newExp[idx].company = e.target.value;
+                          setBuilderData({ ...builderData, experience: newExp });
+                        }}
+                        placeholder="Company Name"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <input
+                        type="text"
+                        value={builderData.experience[idx].title}
+                        onChange={(e) => {
+                          const newExp = [...builderData.experience];
+                          newExp[idx].title = e.target.value;
+                          setBuilderData({ ...builderData, experience: newExp });
+                        }}
+                        placeholder="Job Title"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <input
+                        type="text"
+                        value={builderData.experience[idx].duration}
+                        onChange={(e) => {
+                          const newExp = [...builderData.experience];
+                          newExp[idx].duration = e.target.value;
+                          setBuilderData({ ...builderData, experience: newExp });
+                        }}
+                        placeholder="Duration (e.g. 2020 - 2023)"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <textarea
+                        value={builderData.experience[idx].responsibilities}
+                        onChange={(e) => {
+                          const newExp = [...builderData.experience];
+                          newExp[idx].responsibilities = e.target.value;
+                          setBuilderData({ ...builderData, experience: newExp });
+                        }}
+                        placeholder="Responsibilities..."
+                        rows={3}
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50 resize-none"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold border-b border-vintage-secondary/30 pb-2 flex items-center gap-2"><GraduationCap className="w-5 h-5 text-vintage-primary" /> Education</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[0, 1].map((idx) => (
+                    <div key={`edu-${idx}`} className="bg-vintage-bg/30 p-5 rounded-2xl border border-vintage-secondary/30 space-y-4">
+                      <div className="text-sm font-bold text-vintage-text/60">Education {idx + 1}</div>
+                      <input
+                        type="text"
+                        value={builderData.education[idx].degree}
+                        onChange={(e) => {
+                          const newEdu = [...builderData.education];
+                          newEdu[idx].degree = e.target.value;
+                          setBuilderData({ ...builderData, education: newEdu });
+                        }}
+                        placeholder="Degree"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <input
+                        type="text"
+                        value={builderData.education[idx].institution}
+                        onChange={(e) => {
+                          const newEdu = [...builderData.education];
+                          newEdu[idx].institution = e.target.value;
+                          setBuilderData({ ...builderData, education: newEdu });
+                        }}
+                        placeholder="Institution"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                      <input
+                        type="text"
+                        value={builderData.education[idx].year}
+                        onChange={(e) => {
+                          const newEdu = [...builderData.education];
+                          newEdu[idx].year = e.target.value;
+                          setBuilderData({ ...builderData, education: newEdu });
+                        }}
+                        placeholder="Passing Year"
+                        className="w-full px-4 py-2 rounded-lg border border-vintage-secondary/50 text-sm focus:outline-none focus:border-vintage-primary/50"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Certifications */}
+              <div className="space-y-3">
+                <label className="block text-sm font-bold uppercase tracking-wider opacity-80 flex items-center gap-2"><Award className="w-4 h-4 text-vintage-primary" /> Certifications</label>
+                <textarea
+                  value={builderData.certifications}
+                  onChange={(e) => setBuilderData({ ...builderData, certifications: e.target.value })}
+                  placeholder="AWS Certified Solutions Architect&#10;Google Analytics Individual Qualification..."
                   rows={2}
                   className="w-full px-5 py-3 rounded-xl border-2 border-vintage-secondary/50 focus:outline-none focus:border-vintage-primary/50 focus:ring-4 focus:ring-vintage-primary/10 transition-all font-medium resize-none"
                 />
