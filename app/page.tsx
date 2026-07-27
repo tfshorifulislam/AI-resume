@@ -228,8 +228,8 @@ export default function ResumeAnalyzer() {
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: "-50px" },
-    transition: { duration: 0.5, ease: "easeOut" }
+    viewport: { once: true },
+    transition: { duration: 0.5, ease: "easeOut" as const }
   };
 
   return (
@@ -301,7 +301,7 @@ export default function ResumeAnalyzer() {
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-20 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="space-y-8 text-center lg:text-left"
@@ -343,13 +343,13 @@ export default function ResumeAnalyzer() {
 
           {/* Hero Right Side - Floating Card */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
             className="relative flex justify-center items-center lg:justify-end"
           >
             <motion.div
-              animate={{ y: [-8, 8, -8] }}
+              animate={{ y: [0, -15, 0] }}
               transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
               className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white space-y-8"
             >
@@ -534,7 +534,7 @@ export default function ResumeAnalyzer() {
                 <motion.div
                   initial={{ opacity: 0, height: 0, y: 20 }}
                   animate={{ opacity: 1, height: "auto", y: 0 }}
-                  exit={{ opacity: 0, height: 0, y: -20 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                   className="space-y-8 overflow-hidden pt-4"
                 >
